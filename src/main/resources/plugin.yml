@@ -1,0 +1,7 @@
+name: BridgeRacing
+version: 1.0.0
+main: dtqdev.BridgeRacing.BridgeRacing
+api-version: 1.8
+depend: [FastBuilder, HolographicDisplays, PlaceholderAPI, Multiverse-Core]
+description: BridgeRacing addon for FastBuilder, allowing PvP bridge racing with GUI and checkpoints.
+author: dtqdev

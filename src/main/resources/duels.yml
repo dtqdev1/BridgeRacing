@@ -1,0 +1,39 @@
+duels:
+  map1:
+    world: "pvp_world"
+    spawn1: "0,64,0,0,0"
+    spawn2: "100,64,0,180,0"
+    goldPlate1: "0,64,100"
+    goldPlate2: "100,64,100"
+    corner1_player1: "-10,60,-10"
+    corner2_player1: "10,70,110"
+    corner1_player2: "90,60,-10"
+    corner2_player2: "110,70,110"
+    checkpoints_player1:
+      - "0,64,50"
+    checkpoints_player2:
+      - "100,64,50"
+    displayItem: "SANDSTONE"
+    displayName: "Desert Map"
+    displayLore:
+      - "&7Map: Desert"
+      - "&7Length: 100 blocks"
+  map2:
+    world: "pvp_world"
+    spawn1: "200,64,0,0,0"
+    spawn2: "300,64,0,180,0"
+    goldPlate1: "200,64,100"
+    goldPlate2: "300,64,100"
+    corner1_player1: "190,60,-10"
+    corner2_player1: "210,70,110"
+    corner1_player2: "290,60,-10"
+    corner2_player2: "310,70,110"
+    checkpoints_player1:
+      - "200,64,50"
+    checkpoints_player2:
+      - "300,64,50"
+    displayItem: "STONE"
+    displayName: "Stone Map"
+    displayLore:
+      - "&7Map: Stone"
+      - "&7Length: 100 blocks"

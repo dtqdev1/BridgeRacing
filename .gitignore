@@ -1,0 +1,4 @@
+target/
+.idx/
+.vscode/
+FastBuilder.jar
