@@ -58,7 +58,7 @@ public class GameListener implements Listener {
         }
         if (blockUnder.getType() == Material.IRON_PLATE) {
             for (int i = 0; i < checkpoints.size(); i++) {
-                if (underLoc.equals(checkpoints.get(i)) && i > game.getDuelPlayer(player.getUniqueId()).getLastCheckpointIndex()) {
+                if (underLoc.equals(checkpoints.get(i)) && i == game.getDuelPlayer(player.getUniqueId()).getLastCheckpointIndex() + 1) {
                     game.getDuelPlayer(player.getUniqueId()).setLastCheckpointIndex(i);
                     player.sendMessage(ChatColor.GREEN + "Đã đạt checkpoint " + (i + 1) + "!");
                     player.playSound(player.getLocation(), Sound.LEVEL_UP, 1, 1.5f);
@@ -67,7 +67,7 @@ public class GameListener implements Listener {
         }
 
         // End plate check
-        if (blockUnder.getType() == Material.GOLD_PLATE) {
+        if (blockUnder.getType() == Material.GOLD_PLATE && underLoc.equals(endPlateLoc)) {
             Player opponent = plugin.getServer().getPlayer(game.getDuelPlayer(player.getUniqueId()).getOpponentUUID());
             gameManager.endGame(game, player, opponent);
         }
