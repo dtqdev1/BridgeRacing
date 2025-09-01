@@ -1,7 +1,12 @@
 name: BridgeRacing
-version: 1.0.0
-main: dtqdev.BridgeRacing.BridgeRacing
-api-version: 1.8
-depend: [FastBuilder, HolographicDisplays, PlaceholderAPI, Multiverse-Core]
-description: BridgeRacing addon for FastBuilder, allowing PvP bridge racing with GUI and checkpoints.
+version: 1.0
+main: me.dtqdev.bridgeracing.BridgeRacing
 author: dtqdev
+depend: [FastBuilder, PlaceholderAPI, WorldEdit]
+commands:
+  duel:
+    description: Mở menu thi đấu hoặc quản lý BridgeRacing.
+    aliases: [br]
+  leave:
+    description: Rời khỏi hàng chờ hoặc trận đấu.
+    aliases: [brleave]

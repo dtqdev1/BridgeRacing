@@ -1,0 +1,16 @@
+# Cài đặt chính cho BridgeRacing
+# Khoảng cách giữa 2 làn đường khi tự động tạo map
+lane-offset-x: 100
+lane-offset-y: 0
+lane-offset-z: 0
+
+# Elo khởi điểm cho người chơi mới
+default-elo: 1000
+
+# K-factor cho công thức tính ELO (giá trị tiêu chuẩn là 32)
+elo-k-factor: 32
+
+# Cài đặt cho GUI chọn map
+gui:
+  title: "&1&lChọn Map Thi Đấu"
+  rows: 3

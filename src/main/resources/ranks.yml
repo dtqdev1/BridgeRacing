@@ -1,0 +1,9 @@
+# Định nghĩa các bậc rank dựa trên ELO
+ranks:
+  UNRANKED: { from: 0, to: 999, display: "&7Unranked" }
+  BRONZE: { from: 1000, to: 1199, display: "&cBronze" }
+  SILVER: { from: 1200, to: 1399, display: "&fSilver" }
+  GOLD: { from: 1400, to: 1599, display: "&6Gold" }
+  PLATINUM: { from: 1600, to: 1799, display: "&bPlatinum" }
+  DIAMOND: { from: 1800, to: 1999, display: "&3Diamond" }
+  MASTER: { from: 2000, to: 99999, display: "&dMaster" }
