@@ -3,7 +3,6 @@ package me.dtqdev.bridgeracing.game;
 import me.dtqdev.bridgeracing.BridgeRacing;
 import me.dtqdev.bridgeracing.data.DuelArena;
 import me.dtqdev.bridgeracing.data.DuelPlayer;
-import me.dtqdev.fastbuilder.Arena;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -25,9 +24,11 @@ public class DuelGameManager {
     private final BridgeRacing plugin;
     private final Map<UUID, DuelGame> activeDuels = new ConcurrentHashMap<>();
     private final DecimalFormat df = new DecimalFormat("0.000");
+
     public DuelGameManager(BridgeRacing plugin) {
         this.plugin = plugin;
     }
+
     public void createGame(Player p1, Player p2, DuelArena duelArena) {
         DuelPlayer duelP1 = savePlayerState(p1);
         DuelPlayer duelP2 = savePlayerState(p2);
@@ -40,17 +41,12 @@ public class DuelGameManager {
         preparePlayer(p2, duelArena.getP2_spawn());
         startCountdown(game);
     }
+
     private DuelPlayer savePlayerState(Player player) {
         Location originalLocation = player.getLocation();
-        String originalMode = null;
-        Arena fbArena = plugin.getFastBuilderAPI().getArenaManager().getArenaByPlayer(player);
-        if (fbArena != null) {
-            originalMode = fbArena.getMode();
-            originalLocation = plugin.getFastBuilderAPI().getLobbyLocation();
-            fbArena.reset();
-        }
-        return new DuelPlayer(player.getUniqueId(), originalLocation, originalMode);
+        return new DuelPlayer(player.getUniqueId(), originalLocation, null);
     }
+
     private void preparePlayer(Player player, Location spawn) {
         player.teleport(spawn);
         player.setGameMode(GameMode.SURVIVAL);
@@ -60,6 +56,7 @@ public class DuelGameManager {
         player.getInventory().setItem(2, new ItemStack(Material.DIAMOND_PICKAXE));
         player.updateInventory();
     }
+
     private void startCountdown(DuelGame game) {
         new BukkitRunnable() {
             int count = 5;
@@ -82,6 +79,7 @@ public class DuelGameManager {
             }
         }.runTaskTimer(plugin, 0L, 20L);
     }
+
     private void startGame(DuelGame game) {
         game.startTimers();
         BukkitTask gameTask = new BukkitRunnable() {
@@ -96,6 +94,7 @@ public class DuelGameManager {
         }.runTaskTimer(plugin, 0L, 1L);
         game.setGameTask(gameTask);
     }
+
     public void endGame(DuelGame game, Player winner, Player loser) {
         if (game.getGameState() == DuelGame.GameState.ENDED) return;
         game.stopTasks();
@@ -133,22 +132,14 @@ public class DuelGameManager {
             }
         }.runTaskLater(plugin, 60L);
     }
+
     private void teleportBack(Player player, DuelPlayer duelPlayerData) {
         if (player == null || !player.isOnline() || duelPlayerData == null) return;
         player.setGameMode(GameMode.SURVIVAL);
         player.getInventory().clear();
-        String originalMode = duelPlayerData.getOriginalFastBuilderMode();
-        if (originalMode != null) {
-            Arena newArena = plugin.getFastBuilderAPI().getArenaManager().findAvailableArena(originalMode);
-            if (newArena != null) {
-                newArena.setPlayer(player);
-            } else {
-                player.teleport(plugin.getFastBuilderAPI().getLobbyLocation());
-            }
-        } else {
-            player.teleport(duelPlayerData.getOriginalLocation());
-        }
+        player.teleport(plugin.getFastBuilderAPI().getLobbyLocation());
     }
+
     public void endAllGames() {
         for (DuelGame game : activeDuels.values()) {
             if (game.getGameState() != DuelGame.GameState.ENDED) {
@@ -164,9 +155,11 @@ public class DuelGameManager {
         }
         activeDuels.clear();
     }
+
     public DuelGame getDuelByPlayer(UUID uuid) {
         return activeDuels.get(uuid);
     }
+
     public void handlePlayerFall(Player player, DuelGame game) {
         DuelPlayer duelPlayer = game.getDuelPlayer(player.getUniqueId());
         if (duelPlayer == null) return;
@@ -200,6 +193,7 @@ public class DuelGameManager {
         player.teleport(respawnLoc);
         player.playSound(player.getLocation(), Sound.HURT_FLESH, 1, 1);
     }
+
     public void handlePlayerQuit(Player player, DuelGame game) {
         UUID opponentUUID = game.getDuelPlayer(player.getUniqueId()).getOpponentUUID();
         Player opponent = Bukkit.getPlayer(opponentUUID);
