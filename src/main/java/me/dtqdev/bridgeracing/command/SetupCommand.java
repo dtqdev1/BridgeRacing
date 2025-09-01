@@ -28,9 +28,11 @@ public class SetupCommand implements Listener {
     private final BridgeRacing plugin;
     private final Map<UUID, SetupSession> setupSessions = new HashMap<>();
     private final ItemStack wand;
+
     private enum SetupStep {
         SPAWN_1, CORNER_1, CORNER_2, CHECKPOINTS_1, END_PLATE_1, FINISHED
     }
+
     private static class SetupSession {
         Player admin;
         String id, schematicName;
@@ -43,6 +45,7 @@ public class SetupCommand implements Listener {
             this.schematicName = schematicName;
         }
     }
+
     public SetupCommand(BridgeRacing plugin) {
         this.plugin = plugin;
         this.wand = new ItemStack(Material.BLAZE_ROD);
@@ -55,6 +58,7 @@ public class SetupCommand implements Listener {
         wand.setItemMeta(meta);
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
+
     public void onCommand(CommandSender sender, String[] args) {
         if (!(sender instanceof Player)) {
             sender.sendMessage(ChatColor.RED + "Lệnh này chỉ dành cho người chơi.");
@@ -65,26 +69,23 @@ public class SetupCommand implements Listener {
             return;
         }
         Player player = (Player) sender;
-        if (args.length >= 1 && args[0].equalsIgnoreCase("cancel")) {
-            if (setupSessions.containsKey(player.getUniqueId())) {
-                setupSessions.remove(player.getUniqueId());
-                player.getInventory().remove(wand);
-                player.sendMessage(ChatColor.YELLOW + "Đã hủy phiên thiết lập map.");
-            } else {
-                player.sendMessage(ChatColor.RED + "Bạn không đang trong phiên thiết lập nào.");
-            }
-            return;
-        }
-        if (args.length < 2) {
-            player.sendMessage(ChatColor.RED + "Sử dụng: /duel setup <id> <tên_schematic>");
-            return;
-        }
-        String id = args[0];
-        String schematicName = args[1];
+        String id = args[1];
+        String schematicName = args[2];
         setupSessions.put(player.getUniqueId(), new SetupSession(player, id, schematicName));
         player.getInventory().addItem(wand.clone());
         sendInstruction(player);
     }
+
+    public void cancelSetup(Player player) {
+        if (setupSessions.containsKey(player.getUniqueId())) {
+            setupSessions.remove(player.getUniqueId());
+            player.getInventory().remove(wand);
+            player.sendMessage(ChatColor.YELLOW + "Đã hủy phiên thiết lập map.");
+        } else {
+            player.sendMessage(ChatColor.RED + "Bạn không đang trong phiên thiết lập nào.");
+        }
+    }
+
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
@@ -95,8 +96,8 @@ public class SetupCommand implements Listener {
         SetupSession session = setupSessions.get(player.getUniqueId());
         Action action = event.getAction();
         if (event.getClickedBlock() == null && (session.currentStep != SetupStep.CHECKPOINTS_1)) {
-             player.sendMessage(ChatColor.RED + "Bạn phải click vào một block!");
-             return;
+            player.sendMessage(ChatColor.RED + "Bạn phải click vào một block!");
+            return;
         }
         Location clickedLoc = event.getClickedBlock() != null ? event.getClickedBlock().getLocation() : player.getLocation();
         switch (session.currentStep) {
@@ -137,10 +138,12 @@ public class SetupCommand implements Listener {
                 break;
         }
     }
+
     private void advanceStep(SetupSession session) {
         session.currentStep = SetupStep.values()[session.currentStep.ordinal() + 1];
         sendInstruction(session.admin);
     }
+
     private void sendInstruction(Player player) {
         SetupSession session = setupSessions.get(player.getUniqueId());
         if (session == null) return;
@@ -164,6 +167,7 @@ public class SetupCommand implements Listener {
                 break;
         }
     }
+
     private void finalizeSetup(SetupSession session) {
         Player admin = session.admin;
         admin.sendMessage(ChatColor.GOLD + "Đang xử lý và tạo map...");
@@ -207,10 +211,12 @@ public class SetupCommand implements Listener {
         setupSessions.remove(admin.getUniqueId());
         admin.getInventory().remove(wand);
     }
+
     private String locationToString(Location loc) {
         if (loc == null) return "";
         return loc.getWorld().getName() + "," + loc.getX() + "," + loc.getY() + "," + loc.getZ() + "," + loc.getYaw() + "," + loc.getPitch();
     }
+
     private List<String> locationsToStringList(List<Location> locations) {
         List<String> list = new ArrayList<>();
         for (Location loc : locations) {

@@ -2,6 +2,7 @@ package me.dtqdev.bridgeracing;
 
 import me.dtqdev.bridgeracing.command.DuelCommand;
 import me.dtqdev.bridgeracing.command.LeaveCommand;
+import me.dtqdev.bridgeracing.command.SetupCommand;
 import me.dtqdev.bridgeracing.game.DuelGameManager;
 import me.dtqdev.bridgeracing.listener.GUIListener;
 import me.dtqdev.bridgeracing.listener.GameListener;
@@ -22,6 +23,7 @@ public class BridgeRacing extends JavaPlugin {
     private GUIManager guiManager;
     private SchematicManager schematicManager;
     private DuelRecordManager duelRecordManager;
+    private SetupCommand setupCommand;
 
     @Override
     public void onEnable() {
@@ -44,6 +46,7 @@ public class BridgeRacing extends JavaPlugin {
         this.guiManager = new GUIManager(this);
         this.schematicManager = new SchematicManager(this);
         this.duelRecordManager = new DuelRecordManager(this);
+        this.setupCommand = new SetupCommand(this);
         duelArenaManager.loadArenas();
         getCommand("duel").setExecutor(new DuelCommand(this));
         getCommand("leave").setExecutor(new LeaveCommand(this));
@@ -77,4 +80,5 @@ public class BridgeRacing extends JavaPlugin {
     public GUIManager getGuiManager() { return guiManager; }
     public SchematicManager getSchematicManager() { return schematicManager; }
     public DuelRecordManager getDuelRecordManager() { return duelRecordManager; }
+    public SetupCommand getSetupCommand() { return setupCommand; }
 }
