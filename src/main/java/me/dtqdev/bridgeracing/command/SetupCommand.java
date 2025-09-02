@@ -123,7 +123,7 @@ public class SetupCommand implements Listener {
             case CHECKPOINTS_1:
                 if (action == Action.RIGHT_CLICK_BLOCK) {
                     session.p1_checkpoints.add(clickedLoc);
-                    plugin.getMessageUtil().sendMessage(player, "setup.checkpoint-added", "{count}", session.p1_checkpoints.size());
+                    plugin.getMessageUtil().sendMessage(player, "setup.checkpoint-added", "{count}", String.valueOf(session.p1_checkpoints.size()));
                 } else if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
                     advanceStep(session);
                 }
