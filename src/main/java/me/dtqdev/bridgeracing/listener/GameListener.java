@@ -67,25 +67,25 @@ public class GameListener implements Listener {
         // Xử lý Checkpoint
         for (int i = 0; i < checkpoints.size(); i++) {
             Location cp = checkpoints.get(i);
-            if (cp.getBlockX() == playerBlockLoc.getBlockX() &&
-                cp.getBlockY() == playerBlockLoc.getBlockY() &&
-                cp.getBlockZ() == playerBlockLoc.getBlockZ() &&
-                cp.getBlock().getType() == Material.IRON_PLATE) {
-                // Chỉ kích hoạt khi đây là checkpoint mới
+            // Kiểm tra một khu vực 3x1 theo trục X xung quanh checkpoint
+            if (playerBlockLoc.getBlockY() == cp.getBlockY() &&
+                playerBlockLoc.getBlockZ() == cp.getBlockZ() &&
+                playerBlockLoc.getBlockX() >= cp.getBlockX() - 1 && playerBlockLoc.getBlockX() <= cp.getBlockX() + 1 &&
+                cp.getWorld().getBlockAt(playerBlockLoc).getType() == Material.IRON_PLATE) {
+
                 if (i > game.getDuelPlayer(player.getUniqueId()).getLastCheckpointIndex()) {
                     game.getDuelPlayer(player.getUniqueId()).setLastCheckpointIndex(i);
-                    // Gửi tin nhắn và âm thanh từ config
                     plugin.getMessageUtil().sendMessage(player, "gameplay.checkpoint", "{checkpoint_index}", String.valueOf(i + 1));
                     playSoundFromConfig(player, "sounds.checkpoint");
                 }
             }
         }
         // Xử lý về đích
-        if (endPlateLoc.getBlockX() == playerBlockLoc.getBlockX() &&
-            endPlateLoc.getBlockY() == playerBlockLoc.getBlockY() &&
-            endPlateLoc.getBlockZ() == playerBlockLoc.getBlockZ() &&
-            endPlateLoc.getBlock().getType() == Material.GOLD_PLATE) {
-            // Phát âm thanh khi chạm vào tấm vàng
+        if (playerBlockLoc.getBlockY() == endPlateLoc.getBlockY() &&
+            playerBlockLoc.getBlockZ() == endPlateLoc.getBlockZ() &&
+            playerBlockLoc.getBlockX() >= endPlateLoc.getBlockX() - 1 && playerBlockLoc.getBlockX() <= endPlateLoc.getBlockX() + 1 &&
+            endPlateLoc.getWorld().getBlockAt(playerBlockLoc).getType() == Material.GOLD_PLATE) {
+            
             playSoundFromConfig(player, "sounds.win-plate");
             Player opponent = plugin.getServer().getPlayer(game.getDuelPlayer(player.getUniqueId()).getOpponentUUID());
             gameManager.endGame(game, player, opponent);

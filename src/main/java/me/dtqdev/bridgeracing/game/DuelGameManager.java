@@ -9,6 +9,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+import net.minecraft.server.v1_8_R3.IChatBaseComponent;
+import net.minecraft.server.v1_8_R3.PacketPlayOutTitle;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -95,51 +98,44 @@ public class DuelGameManager {
     
         double timeTaken = game.getElapsedTimeSeconds();
         String mapId = game.getArena().getId();
-    
-        // Xử lý kỷ lục cá nhân (PB)
-        double oldBest = plugin.getDuelRecordManager().getBestTime(winner.getUniqueId(), mapId);
-        plugin.getDuelRecordManager().setBestTime(winner.getUniqueId(), mapId, timeTaken);
-        if (oldBest == -1 || timeTaken < oldBest) {
-            winner.sendMessage(ChatColor.GOLD + "Bạn đã lập kỷ lục mới trên map " + mapId + ": " + df.format(timeTaken) + "s");
+        
+        // Chỉ tính PB nếu người thua không thoát game
+        if (loser != null && loser.isOnline()) {
+            double oldBest = plugin.getDuelRecordManager().getBestTime(winner.getUniqueId(), mapId);
+            plugin.getDuelRecordManager().setBestTime(winner.getUniqueId(), mapId, timeTaken);
+            if (oldBest == -1 || timeTaken < oldBest) {
+                winner.sendMessage(ChatColor.GOLD + "Bạn đã lập kỷ lục mới trên map " + mapId + ": " + df.format(timeTaken) + "s");
+            }
         }
     
-        // --- LOGIC KIỂM TRA THĂNG HẠNG ---
-        // 1. Lấy ELO và Rank CŨ của người thắng TRƯỚC khi cập nhật
         int oldElo = plugin.getEloManager().getElo(winner.getUniqueId());
         me.dtqdev.bridgeracing.data.EloRank oldRank = plugin.getEloManager().getRank(oldElo);
-    
-        // 2. Cập nhật ELO cho cả hai người chơi
         int eloChange = plugin.getEloManager().updateElo(winner.getUniqueId(), loser.getUniqueId());
         plugin.getEloManager().saveAllPlayerData();
-    
-        // 3. Lấy Rank MỚI của người thắng SAU khi cập nhật
         int newElo = plugin.getEloManager().getElo(winner.getUniqueId());
         me.dtqdev.bridgeracing.data.EloRank newRank = plugin.getEloManager().getRank(newElo);
-    
-        // 4. So sánh và gửi Title tương ứng
         boolean rankedUp = (oldRank != null && newRank != null && !oldRank.getId().equals(newRank.getId()) && newRank.getFromElo() > oldRank.getFromElo());
     
+        // Gửi title Win/Lose
+        sendNmsTitle(winner, "&a&lWIN!", "&e+" + eloChange + " ELO", 10, 40, 10);
+        winner.playSound(winner.getLocation(), Sound.LEVEL_UP, 1, 1);
+        sendNmsTitle(loser, "&c&lLOSE!", "&7-" + eloChange + " ELO", 10, 40, 10);
+        loser.playSound(loser.getLocation(), Sound.VILLAGER_NO, 1, 1);
+    
         if (rankedUp) {
-            // Gửi title thăng hạng
-            String rankUpTitle = plugin.getMessageUtil().getRawMessage("game-end.rank-up-title", "{new_rank}", newRank.getDisplayName());
-            String rankUpSubtitle = plugin.getMessageUtil().getRawMessage("game-end.rank-up-subtitle", "{old_rank}", oldRank.getDisplayName(), "{new_rank}", newRank.getDisplayName());
-            winner.sendTitle(
-                ChatColor.translateAlternateColorCodes('&', rankUpTitle),
-                ChatColor.translateAlternateColorCodes('&', rankUpSubtitle)
-            );
-            // Có thể thêm âm thanh đặc biệt ở đây
-            winner.playSound(winner.getLocation(), Sound.ENDERDRAGON_DEATH, 0.8f, 1.2f);
-        } else {
-            // Gửi title chiến thắng thông thường
-            winner.sendTitle(ChatColor.translateAlternateColorCodes('&', "&a&lWIN!"), ChatColor.translateAlternateColorCodes('&', "&e+" + eloChange + " ELO"));
-            winner.playSound(winner.getLocation(), Sound.LEVEL_UP, 1, 1);
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    if (winner != null && winner.isOnline()) {
+                        String rankUpTitle = plugin.getMessageUtil().getRawMessage("game-end.rank-up-title", "{new_rank}", newRank.getDisplayName());
+                        sendNmsTitle(winner, rankUpTitle, "", 10, 60, 20); // Gửi title chính trước
+                        sendEloBarAnimation(winner, oldRank, newRank); // Bắt đầu animation subtitle
+                        winner.playSound(winner.getLocation(), Sound.ENDERDRAGON_DEATH, 0.8f, 1.2f);
+                    }
+                }
+            }.runTaskLater(plugin, 40L); // 2 giây sau
         }
     
-        // Gửi title cho người thua
-        loser.sendTitle(ChatColor.translateAlternateColorCodes('&', "&c&lLOSE!"), ChatColor.translateAlternateColorCodes('&', "&7-" + eloChange + " ELO"));
-        loser.playSound(loser.getLocation(), Sound.VILLAGER_NO, 1, 1);
-        
-        // Bắn pháo hoa cho người thắng
         for (int i = 0; i < 3; i++) {
             new BukkitRunnable() {
                 @Override
@@ -148,12 +144,13 @@ public class DuelGameManager {
                 }
             }.runTaskLater(plugin, i * 15L);
         }
-    
-        // Dọn dẹp trận đấu sau một khoảng thời gian
         new BukkitRunnable() {
             @Override
             public void run() {
-                game.clearAllPlacedBlocks();
+                // --- THAY THẾ game.clearAllPlacedBlocks() BẰNG LOGIC MỚI ---
+                clearLaneRegion(game.getArena().getP1_corner1(), game.getArena().getP1_corner2());
+                clearLaneRegion(game.getArena().getP2_corner1(), game.getArena().getP2_corner2());
+                
                 teleportBack(winner, game.getDuelPlayer(winner.getUniqueId()));
                 teleportBack(loser, game.getDuelPlayer(loser.getUniqueId()));
                 activeDuels.remove(winner.getUniqueId());
@@ -161,7 +158,7 @@ public class DuelGameManager {
                     activeDuels.remove(loser.getUniqueId());
                 }
             }
-        }.runTaskLater(plugin, 60L);
+        }.runTaskLater(plugin, 80L);
     }
     private void teleportBack(Player player, DuelPlayer duelPlayerData) {
         if (player == null || !player.isOnline() || duelPlayerData == null) return;
@@ -219,22 +216,24 @@ public class DuelGameManager {
             respawnLoc.setYaw(spawn.getYaw());
             respawnLoc.setPitch(spawn.getPitch());
         }
-        // Clear placed blocks by this player
+
+        // --- THAY THẾ LOGIC XÓA BLOCK CŨ BẰNG LOGIC MỚI ---
+        Location corner1, corner2;
+        if (player.getUniqueId().equals(game.getDuelPlayer1().getPlayerUUID())) {
+            corner1 = game.getArena().getP1_corner1();
+            corner2 = game.getArena().getP1_corner2();
+        } else {
+            corner1 = game.getArena().getP2_corner1();
+            corner2 = game.getArena().getP2_corner2();
+        }
+        clearLaneRegion(corner1, corner2);
+        
+        // Xóa luôn danh sách cũ để đồng bộ
         List<Block> playerBlocks = game.placedBlocks.get(player.getUniqueId());
         if (playerBlocks != null) {
-            // Dùng BukkitRunnable để tránh lag khi xóa nhiều block
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    for (Block block : new ArrayList<>(playerBlocks)) {
-                        if (block.getType() == Material.SANDSTONE) {
-                            block.setType(Material.AIR);
-                        }
-                    }
-                }
-            }.runTask(plugin);
             playerBlocks.clear();
         }
+        
         player.teleport(respawnLoc);
     }
 
@@ -259,4 +258,84 @@ public int getPlayingCount(String mapId) {
     }
     return count * 2; // Mỗi game có 2 người chơi
 }
+private void sendEloBarAnimation(Player player, me.dtqdev.bridgeracing.data.EloRank oldRank, me.dtqdev.bridgeracing.data.EloRank newRank) {
+    String oldRankDisplay = oldRank.getDisplayName();
+    String newRankDisplay = newRank.getDisplayName();
+    new BukkitRunnable() {
+        int progress = 0;
+        final int totalSteps = 20;
+        @Override
+        public void run() {
+            if (progress > totalSteps || player == null || !player.isOnline()) {
+                if (player != null && player.isOnline()) {
+                    String finalSubtitle = plugin.getMessageUtil().getRawMessage("game-end.rank-up-subtitle", "{old_rank}", oldRankDisplay, "{new_rank}", newRankDisplay);
+                    sendNmsSubtitle(player, finalSubtitle);
+                }
+                this.cancel();
+                return;
+            }
+            StringBuilder bar = new StringBuilder("&7[");
+            int filledChars = (int) Math.floor(((double) progress / totalSteps) * 10);
+            bar.append("&b");
+            for (int i = 0; i < filledChars; i++) bar.append("=");
+            bar.append("&7");
+            for (int i = 0; i < 10 - filledChars; i++) bar.append("-");
+            bar.append("&7]");
+            String subtitle = oldRankDisplay + " &f" + bar.toString() + " &f" + newRankDisplay;
+            sendNmsSubtitle(player, subtitle);
+            progress++;
+        }
+    }.runTaskTimer(plugin, 0L, 1L);
+}
+private void sendNmsTitle(Player player, String title, String subtitle, int fadeIn, int stay, int fadeOut) {
+    if (player == null || !player.isOnline()) return;
+    title = ChatColor.translateAlternateColorCodes('&', title);
+    subtitle = ChatColor.translateAlternateColorCodes('&', subtitle);
+
+    IChatBaseComponent titleComponent = IChatBaseComponent.ChatSerializer.a("{\"text\": \"" + title + "\"}");
+    IChatBaseComponent subtitleComponent = IChatBaseComponent.ChatSerializer.a("{\"text\": \"" + subtitle + "\"}");
+
+    PacketPlayOutTitle timesPacket = new PacketPlayOutTitle(PacketPlayOutTitle.EnumTitleAction.TIMES, null, fadeIn, stay, fadeOut);
+    PacketPlayOutTitle titlePacket = new PacketPlayOutTitle(PacketPlayOutTitle.EnumTitleAction.TITLE, titleComponent);
+    PacketPlayOutTitle subtitlePacket = new PacketPlayOutTitle(PacketPlayOutTitle.EnumTitleAction.SUBTITLE, subtitleComponent);
+
+    ((CraftPlayer) player).getHandle().playerConnection.sendPacket(timesPacket);
+    ((CraftPlayer) player).getHandle().playerConnection.sendPacket(subtitlePacket);
+    ((CraftPlayer) player).getHandle().playerConnection.sendPacket(titlePacket);
+}
+
+private void sendNmsSubtitle(Player player, String subtitle) {
+     if (player == null || !player.isOnline()) return;
+     subtitle = ChatColor.translateAlternateColorCodes('&', subtitle);
+     IChatBaseComponent subtitleComponent = IChatBaseComponent.ChatSerializer.a("{\"text\": \"" + subtitle + "\"}");
+     PacketPlayOutTitle subtitlePacket = new PacketPlayOutTitle(PacketPlayOutTitle.EnumTitleAction.SUBTITLE, subtitleComponent);
+     ((CraftPlayer) player).getHandle().playerConnection.sendPacket(subtitlePacket);
+}
+    private void clearLaneRegion(Location corner1, Location corner2) {
+        if (corner1 == null || corner2 == null) return;
+        
+        World world = corner1.getWorld();
+        int minX = Math.min(corner1.getBlockX(), corner2.getBlockX());
+        int maxX = Math.max(corner1.getBlockX(), corner2.getBlockX());
+        int minY = Math.min(corner1.getBlockY(), corner2.getBlockY());
+        int maxY = Math.max(corner1.getBlockY(), corner2.getBlockY());
+        int minZ = Math.min(corner1.getBlockZ(), corner2.getBlockZ());
+        int maxZ = Math.max(corner1.getBlockZ(), corner2.getBlockZ());
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                for (int x = minX; x <= maxX; x++) {
+                    for (int y = minY; y <= maxY; y++) {
+                        for (int z = minZ; z <= maxZ; z++) {
+                            Block block = world.getBlockAt(x, y, z);
+                            if (block.getType() == Material.SANDSTONE) {
+                                block.setType(Material.AIR);
+                            }
+                        }
+                    }
+                }
+            }
+        }.runTask(plugin);
+    }
 }

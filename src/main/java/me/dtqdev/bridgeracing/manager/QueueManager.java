@@ -96,7 +96,39 @@ public class QueueManager {
                                 Player p1 = Bukkit.getPlayer(finalP1Data.getUuid());
                                 Player p2 = Bukkit.getPlayer(finalP2Data.getUuid());
                                 if (p1 != null && p1.isOnline() && p2 != null && p2.isOnline()) {
-                                    plugin.getDuelGameManager().createGame(p1, p2, plugin.getDuelArenaManager().getDuelArenaById(finalMapId));
+                                    // --- THÊM MỚI BẮT ĐẦU ---
+                                    DuelArena arena = plugin.getDuelArenaManager().getDuelArenaById(finalMapId);
+                                    if (arena == null) return;
+
+                                    // Gửi thông báo cho người chơi 1
+                                    int p2_elo = eloManager.getElo(p2.getUniqueId());
+                                    me.dtqdev.bridgeracing.data.EloRank p2_rank = eloManager.getRank(p2_elo);
+                                    String p2_rank_display = p2_rank != null ? p2_rank.getDisplayName() : "&7N/A";
+                                    for (String line : plugin.getMessageUtil().getMessageList("queue.match-found",
+                                            "{opponent_name}", p2.getName(), // Khớp với {opponent_name}
+                                            "{opponent_rank}", p2_rank_display, // Khớp với {opponent_rank}
+                                            "{opponent_elo}", String.valueOf(p2_elo), // Khớp với {opponent_elo}
+                                            "{map_name}", arena.getDisplayName())) {
+                                        p1.sendMessage(line);
+                                    }
+                                    p1.playSound(p1.getLocation(), org.bukkit.Sound.ORB_PICKUP, 1, 1.2f);
+
+
+                                    // Gửi thông báo cho người chơi 2
+                                    int p1_elo = eloManager.getElo(p1.getUniqueId());
+                                    me.dtqdev.bridgeracing.data.EloRank p1_rank = eloManager.getRank(p1_elo);
+                                    String p1_rank_display = p1_rank != null ? p1_rank.getDisplayName() : "&7N/A";
+                                    for (String line : plugin.getMessageUtil().getMessageList("queue.match-found",
+                                            "{opponent_name}", p1.getName(),
+                                            "{opponent_rank}", p1_rank_display,
+                                            "{opponent_elo}", String.valueOf(p1_elo),
+                                            "{map_name}", arena.getDisplayName())) {
+                                        p2.sendMessage(line);
+                                    }
+                                    p2.playSound(p2.getLocation(), org.bukkit.Sound.ORB_PICKUP, 1, 1.2f);
+                                    // --- THÊM MỚI KẾT THÚC ---
+
+                                    plugin.getDuelGameManager().createGame(p1, p2, arena);
                                 }
                             }
                         }.runTask(plugin);

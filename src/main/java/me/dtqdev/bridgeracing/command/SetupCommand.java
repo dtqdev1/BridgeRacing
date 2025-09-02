@@ -95,17 +95,16 @@ public class SetupCommand implements Listener {
         event.setCancelled(true);
         SetupSession session = setupSessions.get(player.getUniqueId());
         Action action = event.getAction();
-        if (event.getClickedBlock() == null && (session.currentStep != SetupStep.CHECKPOINTS_1)) {
+        if (event.getClickedBlock() == null && (session.currentStep != SetupStep.SPAWN_1 && session.currentStep != SetupStep.CHECKPOINTS_1)) {
             player.sendMessage(ChatColor.RED + "Bạn phải click vào một block!");
             return;
         }
         Location clickedLoc = event.getClickedBlock() != null ? event.getClickedBlock().getLocation() : player.getLocation();
         switch (session.currentStep) {
             case SPAWN_1:
-                if (action == Action.RIGHT_CLICK_BLOCK) {
-                    session.p1_spawn = clickedLoc.clone().add(0.5, 1, 0.5);
-                    session.p1_spawn.setYaw(player.getLocation().getYaw());
-                    session.p1_spawn.setPitch(player.getLocation().getPitch());
+                if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
+                    session.p1_spawn = player.getLocation().clone(); // Lấy trực tiếp vị trí và hướng nhìn của người chơi
+                    player.sendMessage(ChatColor.GREEN + "Đã đặt điểm spawn cho Làn 1 tại vị trí bạn đang đứng.");
                     advanceStep(session);
                 }
                 break;
@@ -151,7 +150,7 @@ public class SetupCommand implements Listener {
         ChatColor a = ChatColor.AQUA;
         switch (session.currentStep) {
             case SPAWN_1:
-                player.sendMessage(p + "Bước 1/5: " + a + "Chuột phải vào block để đặt ĐIỂM SPAWN cho Làn 1.");
+            player.sendMessage(p + "Bước 1/5: " + a + "Đứng tại vị trí spawn, nhìn đúng hướng và CHUỘT PHẢI để đặt ĐIỂM SPAWN cho Làn 1.");
                 break;
             case CORNER_1:
                 player.sendMessage(p + "Bước 2/5: " + a + "Chuột trái vào block để đặt GÓC THỨ NHẤT của bounding box.");

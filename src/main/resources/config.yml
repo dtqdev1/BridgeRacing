@@ -63,10 +63,10 @@ hologram:
 
 # Item để mở GUI trong FastBuilder
 fastbuilder-item:
-  slot: 2
+  slot: 4 # Phải khớp với slot trong config của FastBuilder
   material: "INK_SACK"
-  data: 5 # 5 = Purple Dye
-  name: "&5&lChế độ thi đấu"
+  data: 2 # Phải khớp (Green Dye)
+  name: "&a&lThi Đấu BridgeRacing" # Phải khớp chính xác
   lore:
-    - "&7Click để mở menu thi đấu"
+    - "&7Click để mở menu thi đấu!"
     - "&7BridgeRacing!"

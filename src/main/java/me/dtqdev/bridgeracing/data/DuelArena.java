@@ -66,6 +66,10 @@ public class DuelArena {
                loc.getY() >= minY && loc.getY() <= maxY &&
                loc.getZ() >= minZ && loc.getZ() <= maxZ;
     }
+    public Location getP1_corner1() { return p1_corner1; }
+    public Location getP1_corner2() { return p1_corner2; }
+    public Location getP2_corner1() { return p2_corner1; }
+    public Location getP2_corner2() { return p2_corner2; }
     public Location getP2_endPlate() {
         return p2_endPlate;
     }

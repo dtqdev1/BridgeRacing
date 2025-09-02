@@ -21,7 +21,9 @@ queue:
     - "&a&m----------------------------------"
     - "          &d&lĐÃ TÌM THẤY TRẬN ĐẤU!"
     - ""
-    - "      &fĐối thủ: &c{opponent} &7({elo} ELO)"
+    - "      &fĐối thủ: &c{opponent_name}" # Sửa thành opponent_name
+    - "      &fRank: {opponent_rank}"
+    - "      &fELO: &e{opponent_elo}" # Sửa thành opponent_elo
     - "      &fMap: &e{map_name}"
     - ""
     - "&7Trận đấu sẽ bắt đầu sau vài giây..."
