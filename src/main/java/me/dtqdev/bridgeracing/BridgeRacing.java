@@ -8,8 +8,12 @@ import me.dtqdev.bridgeracing.listener.GUIListener;
 import me.dtqdev.bridgeracing.listener.GameListener;
 import me.dtqdev.bridgeracing.manager.*;
 import me.dtqdev.fastbuilder.FastbuilderMain;
+import org.bukkit.configuration.file.FileConfiguration; // Thêm import
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import me.dtqdev.bridgeracing.listener.FastBuilderListener;
+import me.dtqdev.bridgeracing.spectate.SpectateManager;
+import me.dtqdev.bridgeracing.util.MessageUtil;
 
 public class BridgeRacing extends JavaPlugin {
     private static BridgeRacing instance;
@@ -17,13 +21,15 @@ public class BridgeRacing extends JavaPlugin {
     private ConfigManager configManager;
     private DuelArenaManager duelArenaManager;
     private EloManager eloManager;
-    private HistoryManager historyManager;
+    // private HistoryManager historyManager; // Đã xóa
     private QueueManager queueManager;
     private DuelGameManager duelGameManager;
     private GUIManager guiManager;
     private SchematicManager schematicManager;
     private DuelRecordManager duelRecordManager;
     private SetupCommand setupCommand;
+    private SpectateManager spectateManager;
+    private MessageUtil messageUtil;
 
     @Override
     public void onEnable() {
@@ -37,21 +43,29 @@ public class BridgeRacing extends JavaPlugin {
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
+
         this.configManager = new ConfigManager(this);
         this.duelArenaManager = new DuelArenaManager(this);
         this.eloManager = new EloManager(this);
-        this.historyManager = new HistoryManager(this);
+        // this.historyManager = new HistoryManager(this); // Đã xóa
         this.queueManager = new QueueManager(this);
         this.duelGameManager = new DuelGameManager(this);
         this.guiManager = new GUIManager(this);
         this.schematicManager = new SchematicManager(this);
         this.duelRecordManager = new DuelRecordManager(this);
         this.setupCommand = new SetupCommand(this);
+        this.messageUtil = new MessageUtil(this);
+        this.spectateManager = new SpectateManager(this);
+
         duelArenaManager.loadArenas();
+
         getCommand("duel").setExecutor(new DuelCommand(this));
         getCommand("leave").setExecutor(new LeaveCommand(this));
+
         getServer().getPluginManager().registerEvents(new GUIListener(this), this);
         getServer().getPluginManager().registerEvents(new GameListener(this), this);
+        getServer().getPluginManager().registerEvents(new FastBuilderListener(this), this);
+
         if (getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
             new BridgeRacingExpansion(this).register();
             getLogger().info("Successfully registered placeholders.");
@@ -74,11 +88,18 @@ public class BridgeRacing extends JavaPlugin {
     public ConfigManager getConfigManager() { return configManager; }
     public DuelArenaManager getDuelArenaManager() { return duelArenaManager; }
     public EloManager getEloManager() { return eloManager; }
-    public HistoryManager getHistoryManager() { return historyManager; }
+    // public HistoryManager getHistoryManager() { return historyManager; } // Đã xóa
     public QueueManager getQueueManager() { return queueManager; }
     public DuelGameManager getDuelGameManager() { return duelGameManager; }
     public GUIManager getGuiManager() { return guiManager; }
     public SchematicManager getSchematicManager() { return schematicManager; }
     public DuelRecordManager getDuelRecordManager() { return duelRecordManager; }
     public SetupCommand getSetupCommand() { return setupCommand; }
+    public SpectateManager getSpectateManager() { return spectateManager; }
+    public MessageUtil getMessageUtil() { return messageUtil; }
+
+    // Thêm getter này
+    public FileConfiguration getMessagesConfig() {
+        return this.configManager.getMessagesConfig();
+    }
 }

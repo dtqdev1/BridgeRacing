@@ -1,19 +1,16 @@
 package me.dtqdev.bridgeracing.command;
-
 import me.dtqdev.bridgeracing.BridgeRacing;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
 public class DuelCommand implements CommandExecutor {
     private final BridgeRacing plugin;
-
     public DuelCommand(BridgeRacing plugin) {
         this.plugin = plugin;
     }
-
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player)) {
@@ -21,43 +18,62 @@ public class DuelCommand implements CommandExecutor {
             return true;
         }
         Player player = (Player) sender;
-
         if (args.length == 0) {
             plugin.getGuiManager().openMapSelector(player);
             return true;
         }
-
-        if (args[0].equalsIgnoreCase("setup")) {
-            if (!player.hasPermission("bridgeracing.admin")) {
-                player.sendMessage(ChatColor.RED + "Bạn không có quyền sử dụng lệnh này.");
-                return true;
-            }
-            if (args.length < 3) {
-                if (args.length == 2 && args[1].equalsIgnoreCase("cancel")) {
-                    plugin.getSetupCommand().cancelSetup(player);
+        String subCommand = args[0].toLowerCase();
+        switch (subCommand) {
+            case "setup":
+                if (!player.hasPermission("bridgeracing.admin")) {
+                    plugin.getMessageUtil().sendMessage(player, "error.no-permission");
                     return true;
                 }
-                player.sendMessage(ChatColor.RED + "Sử dụng: /duel setup <id> <schematic_name> hoặc /duel setup cancel");
-                return true;
-            }
-            plugin.getSetupCommand().onCommand(player, args);
-            return true;
+                if (args.length < 3) {
+                    if (args.length == 2 && args[1].equalsIgnoreCase("cancel")) {
+                        plugin.getSetupCommand().cancelSetup(player);
+                        return true;
+                    }
+                    plugin.getMessageUtil().sendMessage(player, "command.setup.invalid-args");
+                    return true;
+                }
+                plugin.getSetupCommand().onCommand(player, args);
+                break;
+            case "delete":
+                if (!player.hasPermission("bridgeracing.admin")) {
+                    plugin.getMessageUtil().sendMessage(player, "error.no-permission");
+                    return true;
+                }
+                if (args.length != 2) {
+                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&cSử dụng: /duel delete <id>"));
+                    return true;
+                }
+                plugin.getDuelArenaManager().deleteArena(args[1], player);
+                break;
+            case "spectate":
+                if (args.length < 2) {
+                    player.sendMessage(ChatColor.RED + "Sử dụng: /duel spectate <tên_người_chơi>");
+                    return true;
+                }
+                Player target = Bukkit.getPlayer(args[1]);
+                if (target == null) {
+                    player.sendMessage(ChatColor.RED + "Không tìm thấy người chơi này.");
+                    return true;
+                }
+                if (target.equals(player)) {
+                    plugin.getMessageUtil().sendMessage(player, "command.spectate.self");
+                    return true;
+                }
+                if (plugin.getDuelGameManager().getDuelByPlayer(target.getUniqueId()) == null) {
+                    plugin.getMessageUtil().sendMessage(player, "command.spectate.not-in-game");
+                    return true;
+                }
+                plugin.getSpectateManager().startSpectating(player, target);
+                break;
+            default:
+                plugin.getGuiManager().openMapSelector(player);
+                break;
         }
-
-        if (args[0].equalsIgnoreCase("delete")) {
-            if (!player.hasPermission("bridgeracing.admin")) {
-                player.sendMessage(ChatColor.RED + "Bạn không có quyền sử dụng lệnh này.");
-                return true;
-            }
-            if (args.length != 2) {
-                player.sendMessage(ChatColor.RED + "Sử dụng: /duel delete <id>");
-                return true;
-            }
-            plugin.getDuelArenaManager().deleteArena(args[1], player);
-            return true;
-        }
-
-        player.sendMessage(ChatColor.RED + "Lệnh không hợp lệ. Sử dụng: /duel [setup|delete]");
         return true;
     }
 }

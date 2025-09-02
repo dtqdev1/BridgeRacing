@@ -1,0 +1,58 @@
+# Các placeholder có sẵn:
+# {player}, {opponent}, {map_name}, {elo}, {elo_change}, {rank_name}, {old_pb}, {new_pb}, {diff_pb}, {time}
+
+prefix: "&d&lBridgeRacing &8» "
+
+# Tin nhắn chung
+error:
+  no-permission: "&cBạn không có quyền."
+  player-only: "&cChỉ người chơi mới có thể dùng lệnh này."
+  in-game: "&cBạn đang trong trận đấu, không thể thực hiện hành động này!"
+  not-in-game: "&cBạn không ở trong trận đấu nào."
+  in-queue: "&cBạn đã ở trong hàng chờ rồi."
+  not-in-queue: "&cBạn không ở trong hàng chờ nào."
+  map-not-found: "&cKhông tìm thấy map đấu '{map_id}'."
+
+# Hàng chờ và ghép trận
+queue:
+  join: "&aBạn đã tham gia hàng chờ cho map &e{map_name}&a."
+  leave: "&eBạn đã rời khỏi hàng chờ."
+  match-found:
+    - "&a&m----------------------------------"
+    - "          &d&lĐÃ TÌM THẤY TRẬN ĐẤU!"
+    - ""
+    - "      &fĐối thủ: &c{opponent} &7({elo} ELO)"
+    - "      &fMap: &e{map_name}"
+    - ""
+    - "&7Trận đấu sẽ bắt đầu sau vài giây..."
+    - "&a&m----------------------------------"
+
+# Trong trận đấu
+gameplay:
+  checkpoint: "&aĐã đạt checkpoint {checkpoint_index}!"
+  fall: "&cBạn đã bị rơi! Quay lại checkpoint cuối cùng."
+  new-pb: "&6&lKỶ LỤC MỚI! &eBạn đã hoàn thành map trong &b{new_pb}s&e, nhanh hơn &a{diff_pb}s &eso với kỷ lục cũ ({old_pb}s)!"
+
+# Kết thúc trận đấu
+game-end:
+  win-title: "&a&lCHIẾN THẮNG!"
+  win-subtitle: "&e+{elo_change} ELO"
+  lose-title: "&c&lTHẤT BẠI!"
+  lose-subtitle: "&7-{elo_change} ELO"
+  rank-up-title: "&b&lTHĂNG HẠNG!"
+  rank-up-subtitle: "&7{old_rank} &f-> &b{new_rank}"
+
+# Lệnh
+command:
+  setup:
+    start: "&aBắt đầu thiết lập map '{id}'. Sử dụng cây gậy thần kỳ để chọn vị trí."
+    cancel: "&eĐã hủy phiên thiết lập."
+    invalid-args: "&cSử dụng: /duel setup <id> <tên_schematic>"
+  delete:
+    success: "&aĐã xóa thành công map '{id}'."
+    fail: "&cKhông tìm thấy map với ID '{id}'."
+  spectate:
+    start: "&aBạn đang theo dõi {player}."
+    stop: "&eBạn đã ngừng theo dõi."
+    not-in-game: "&cNgười chơi này không ở trong trận đấu."
+    self: "&cBạn không thể tự theo dõi mình."

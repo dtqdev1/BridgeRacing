@@ -44,22 +44,24 @@ public class DuelArena {
     public Location getP1_endPlate() { return p1_endPlate; }
     public Location getP2_spawn() { return p2_spawn; }
     public List<Location> getP2_checkpoints() { return p2_checkpoints; }
-    public boolean isInBounds(Player player, UUID uuid1) {
-        Location loc = player.getLocation();
+    public boolean isInBounds(Location loc, UUID player1UUID, UUID currentUUID) {
         Location corner1, corner2;
-        if (player.getUniqueId().equals(uuid1)) {
+        if (currentUUID.equals(player1UUID)) {
             corner1 = p1_corner1;
             corner2 = p1_corner2;
         } else {
             corner1 = p2_corner1;
             corner2 = p2_corner2;
         }
+
+        // Đảm bảo corner1 luôn là điểm nhỏ nhất và corner2 là lớn nhất
         double minX = Math.min(corner1.getX(), corner2.getX());
         double maxX = Math.max(corner1.getX(), corner2.getX());
         double minY = Math.min(corner1.getY(), corner2.getY());
         double maxY = Math.max(corner1.getY(), corner2.getY());
         double minZ = Math.min(corner1.getZ(), corner2.getZ());
         double maxZ = Math.max(corner1.getZ(), corner2.getZ());
+
         return loc.getX() >= minX && loc.getX() <= maxX &&
                loc.getY() >= minY && loc.getY() <= maxY &&
                loc.getZ() >= minZ && loc.getZ() <= maxZ;

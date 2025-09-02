@@ -120,4 +120,26 @@ public class QueueManager {
         }
         return false;
     }
+    // Thêm 2 phương thức này vào file QueueManager.java
+public String getQueueMapId(Player player) {
+    for (Map.Entry<String, List<PlayerInQueue>> entry : queues.entrySet()) {
+        for (PlayerInQueue p : entry.getValue()) {
+            if (p.getUuid().equals(player.getUniqueId())) {
+                return entry.getKey();
+            }
+        }
+    }
+    return null; // Trả về null nếu không tìm thấy
+}
+
+public long getTimeInQueue(Player player) {
+    for (List<PlayerInQueue> queue : queues.values()) {
+        for (PlayerInQueue p : queue) {
+            if (p.getUuid().equals(player.getUniqueId())) {
+                return System.currentTimeMillis() - p.getJoinTime();
+            }
+        }
+    }
+    return 0; // Trả về 0 nếu không trong hàng chờ
+}
 }

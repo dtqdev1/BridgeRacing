@@ -3,15 +3,14 @@ package me.dtqdev.bridgeracing.manager;
 import me.dtqdev.bridgeracing.BridgeRacing;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-
 import java.io.File;
 import java.io.IOException;
 
 public class ConfigManager {
 
     private final BridgeRacing plugin;
-    private FileConfiguration duelsConfig, ranksConfig, playerDataConfig, historyConfig;
-    private File duelsFile, ranksFile, playerdataFile, historyFile;
+    private FileConfiguration duelsConfig, ranksConfig, playerDataConfig, messagesConfig;
+    private File duelsFile, ranksFile, playerdataFile, messagesFile;
 
     public ConfigManager(BridgeRacing plugin) {
         this.plugin = plugin;
@@ -22,25 +21,22 @@ public class ConfigManager {
         if (!plugin.getDataFolder().exists()) {
             plugin.getDataFolder().mkdirs();
         }
-
-        // Setup config.yml (có sẵn)
         plugin.saveDefaultConfig();
 
-        // Setup các file tùy chỉnh
         duelsFile = new File(plugin.getDataFolder(), "duels.yml");
         ranksFile = new File(plugin.getDataFolder(), "ranks.yml");
         playerdataFile = new File(plugin.getDataFolder(), "playerdata.yml");
-        historyFile = new File(plugin.getDataFolder(), "history.yml");
+        messagesFile = new File(plugin.getDataFolder(), "messages.yml"); // Thêm messages.yml
 
         if (!duelsFile.exists()) saveResource("duels.yml");
         if (!ranksFile.exists()) saveResource("ranks.yml");
+        if (!messagesFile.exists()) saveResource("messages.yml"); // Thêm messages.yml
         if (!playerdataFile.exists()) createFile(playerdataFile);
-        if (!historyFile.exists()) createFile(historyFile);
 
         duelsConfig = YamlConfiguration.loadConfiguration(duelsFile);
         ranksConfig = YamlConfiguration.loadConfiguration(ranksFile);
         playerDataConfig = YamlConfiguration.loadConfiguration(playerdataFile);
-        historyConfig = YamlConfiguration.loadConfiguration(historyFile);
+        messagesConfig = YamlConfiguration.loadConfiguration(messagesFile); // Thêm messages.yml
     }
 
     public void reload() {
@@ -48,16 +44,14 @@ public class ConfigManager {
         duelsConfig = YamlConfiguration.loadConfiguration(duelsFile);
         ranksConfig = YamlConfiguration.loadConfiguration(ranksFile);
         playerDataConfig = YamlConfiguration.loadConfiguration(playerdataFile);
-        historyConfig = YamlConfiguration.loadConfiguration(historyFile);
+        messagesConfig = YamlConfiguration.loadConfiguration(messagesFile); // Thêm messages.yml
     }
 
-    // --- Getters ---
     public FileConfiguration getDuelsConfig() { return duelsConfig; }
     public FileConfiguration getRanksConfig() { return ranksConfig; }
     public FileConfiguration getPlayerDataConfig() { return playerDataConfig; }
-    public FileConfiguration getHistoryConfig() { return historyConfig; }
+    public FileConfiguration getMessagesConfig() { return messagesConfig; } // Thêm getter cho messages
 
-    // --- Savers ---
     public void savePlayerData() {
         try {
             playerDataConfig.save(playerdataFile);
@@ -65,16 +59,9 @@ public class ConfigManager {
             plugin.getLogger().severe("Could not save playerdata.yml!");
         }
     }
-
-    public void saveHistory() {
-        try {
-            historyConfig.save(historyFile);
-        } catch (IOException e) {
-            plugin.getLogger().severe("Could not save history.yml!");
-        }
-    }
     
-    // --- Helpers ---
+    // Đã xóa saveHistory()
+
     private void createFile(File file) {
         if (!file.exists()) {
             try {
@@ -84,10 +71,11 @@ public class ConfigManager {
             }
         }
     }
-    
+
     private void saveResource(String resourcePath) {
         plugin.saveResource(resourcePath, false);
     }
+
     public void saveDuelsConfig() {
         try {
             duelsConfig.save(duelsFile);

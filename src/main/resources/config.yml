@@ -1,16 +1,72 @@
-# Cài đặt chính cho BridgeRacing
-# Khoảng cách giữa 2 làn đường khi tự động tạo map
-lane-offset-x: 100
-lane-offset-y: 0
-lane-offset-z: 0
+# Bật/tắt tin nhắn gỡ lỗi trong console
+debug: false
 
-# Elo khởi điểm cho người chơi mới
+# Khoảng cách giữa 2 làn đường khi tạo map bằng lệnh setup
+lane-offset-x: 100.0
+lane-offset-y: 0.0
+lane-offset-z: 0.0
+
+# Cài đặt hệ thống ELO
 default-elo: 1000
+elo:
+  k-factor: 32 # Yếu tố quyết định mức độ thay đổi ELO, càng cao thay đổi càng lớn
+  # Tỷ lệ ELO nhận/mất dựa trên chênh lệch ELO (người thắng - người thua)
+  # Ví dụ: chênh lệch -200 (thua người mạnh hơn) sẽ mất ít ELO hơn
+  elo-difference-scaling:
+    - { diff: -500, win: 1.5, loss: 0.5 } # Thắng người mạnh hơn rất nhiều -> được 150% ELO, thua chỉ mất 50%
+    - { diff: -200, win: 1.2, loss: 0.8 }
+    - { diff: 0, win: 1.0, loss: 1.0 } # ELO bằng nhau -> nhận/mất 100%
+    - { diff: 200, win: 0.8, loss: 1.2 }
+    - { diff: 500, win: 0.5, loss: 1.5 } # Thắng người yếu hơn rất nhiều -> được 50% ELO, thua mất 150%
 
-# K-factor cho công thức tính ELO (giá trị tiêu chuẩn là 32)
-elo-k-factor: 32
-
-# Cài đặt cho GUI chọn map
+# Cài đặt GUI chọn map
 gui:
   title: "&1&lChọn Map Thi Đấu"
   rows: 3
+  # Thông tin hiển thị khi người chơi đang trong hàng chờ
+  in-queue-item:
+    material: "BARRIER"
+    name: "&c&lBạn đang trong hàng chờ"
+    lore:
+      - "&7Map: &e{map_name}"
+      - "&7Thời gian chờ: &e{time}"
+      - ""
+      - "&aClick để rời hàng chờ!"
+  # Tùy chỉnh item cho từng map (sẽ ghi đè item trong duels.yml nếu tồn tại)
+  map-items:
+    canyon: # id của map
+      material: "SAND"
+      name: "&6&lThung lũng Canyon"
+      lore:
+        - "&7Một map đấu đầy thử thách!"
+        - ""
+        - "&fNgười trong hàng chờ: &a{queue_size}"
+        - "&fĐang thi đấu: &a{playing_size}"
+        - "&fThời gian chờ dự kiến: &a{wait_time}"
+        - ""
+        - "&eClick để tham gia!"
+
+# Cài đặt âm thanh
+sounds:
+  checkpoint: "LEVEL_UP,1.0,1.5" # Tên Sound, volume, pitch
+  win-plate: "LEVEL_UP,1.0,1.2"
+  game-win: "ENDERDRAGON_DEATH,1.0,1.0"
+  game-lose: "VILLAGER_NO,1.0,1.0"
+  countdown-tick: "NOTE_STICKS,1.0,1.0"
+  countdown-go: "NOTE_PLING,1.0,1.5"
+
+# Cài đặt Hologram trong FastBuilder
+hologram:
+  top-rank-enabled: true
+  top-rank-limit: 50 # Chỉ hiển thị cho top 50
+  top-rank-format: "&b&l#&f{rank} &bBridgeRacing"
+
+# Item để mở GUI trong FastBuilder
+fastbuilder-item:
+  slot: 2
+  material: "INK_SACK"
+  data: 5 # 5 = Purple Dye
+  name: "&5&lChế độ thi đấu"
+  lore:
+    - "&7Click để mở menu thi đấu"
+    - "&7BridgeRacing!"

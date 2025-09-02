@@ -1,5 +1,5 @@
 name: BridgeRacing
-version: 1.0
+version: 1.1
 main: me.dtqdev.bridgeracing.BridgeRacing
 author: dtqdev
 depend: [FastBuilder, PlaceholderAPI, WorldEdit]
@@ -8,5 +8,5 @@ commands:
     description: Mở menu thi đấu hoặc quản lý BridgeRacing.
     aliases: [br]
   leave:
-    description: Rời khỏi hàng chờ hoặc trận đấu.
+    description: Rời khỏi hàng chờ hoặc trận đấu hiện tại.
     aliases: [brleave]
