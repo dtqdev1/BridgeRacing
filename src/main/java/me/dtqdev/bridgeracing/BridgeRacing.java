@@ -51,6 +51,7 @@ public class BridgeRacing extends JavaPlugin {
         this.queueManager = new QueueManager(this);
         this.duelGameManager = new DuelGameManager(this);
         this.guiManager = new GUIManager(this);
+        this.guiManager.startGuiUpdateTask();
         this.schematicManager = new SchematicManager(this);
         this.duelRecordManager = new DuelRecordManager(this);
         this.setupCommand = new SetupCommand(this);

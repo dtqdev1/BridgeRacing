@@ -50,6 +50,7 @@ command:
     start: "&aBắt đầu thiết lập map '{id}'. Sử dụng cây gậy thần kỳ để chọn vị trí."
     cancel: "&eĐã hủy phiên thiết lập."
     invalid-args: "&cSử dụng: /duel setup <id> <tên_schematic>"
+    not-in-setup: "&cBạn không đang thiết lập map nào"
   delete:
     success: "&aĐã xóa thành công map '{id}'."
     fail: "&cKhông tìm thấy map với ID '{id}'."
@@ -58,3 +59,29 @@ command:
     stop: "&eBạn đã ngừng theo dõi."
     not-in-game: "&cNgười chơi này không ở trong trận đấu."
     self: "&cBạn không thể tự theo dõi mình."
+    usage: "&cSử dụng: /duel spectate <tên_người_chơi>"
+    player-not-found: "&cKhông tìm thấy người chơi này."
+  delete:
+    usage: "&cSử dụng: /duel delete <id>"
+    success: "&aĐã xóa thành công map '{id}'."
+    fail: "&cKhông tìm thấy map với ID '{id}'."
+  leave:
+    success-game: "&eBạn đã rời khỏi trận đấu."
+    success-queue: "&eBạn đã rời khỏi hàng chờ."
+    not-in-any: "&cBạn không đang trong hàng chờ hoặc trận đấu nào."
+
+gui:
+  leave-queue-success: "&eĐã rời hàng chờ."
+setup:
+  must-be-player: "&cLệnh này chỉ dành cho người chơi."
+  step1: "&dBước 1/5: &bĐứng tại vị trí spawn, nhìn đúng hướng và CHUỘT PHẢI để đặt ĐIỂM SPAWN cho Làn 1."
+  step2: "&dBước 2/5: &bChuột trái vào block để đặt GÓC THỨ NHẤT của bounding box."
+  step3: "&dBước 3/5: &bChuột phải vào block để đặt GÓC THỨ HAI của bounding box."
+  step4: "&dBước 4/5: &bChuột phải để thêm CHECKPOINT, chuột trái khi đã thêm xong."
+  step5: "&dBước 5/5: &bChuột phải vào block để đặt GOLD PLATE kết thúc."
+  checkpoint-added: "&aĐã thêm checkpoint {count}. Chuột phải để thêm, chuột trái khi đã thêm xong."
+  set-spawn: "&aĐã đặt điểm spawn cho Làn 1 tại vị trí bạn đang đứng."
+  must-click-block: "&cBạn phải click vào một block!"
+  processing: "&6Đang xử lý và tạo map..."
+  finalize-error: "&cLỗi khi dán schematic: {error}"
+  finalize-success: "&aĐã thiết lập thành công map '{id}'!"

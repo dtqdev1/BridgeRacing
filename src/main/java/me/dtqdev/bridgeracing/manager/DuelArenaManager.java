@@ -55,14 +55,18 @@ public class DuelArenaManager {
     public void deleteArena(String id, Player player) {
         FileConfiguration config = plugin.getConfigManager().getDuelsConfig();
         if (!config.isConfigurationSection("duel-arenas." + id)) {
-            player.sendMessage(ChatColor.RED + "Không tìm thấy map với ID: " + id);
+            plugin.getMessageUtil().sendMessage(player, "error.map-not-found", "{map_id}", id);
+            return;
+        }
+        if (!player.hasPermission("bridgeracing.admin")) {
+            plugin.getMessageUtil().sendMessage(player, "error.no-permission");
             return;
         }
         config.set("duel-arenas." + id, null);
         plugin.getConfigManager().saveDuelsConfig();
         duelArenas.remove(id);
         plugin.getLogger().info("Deleted arena " + id + " by " + player.getName());
-        player.sendMessage(ChatColor.GREEN + "Đã xóa map '" + id + "' thành công!");
+        plugin.getMessageUtil().sendMessage(player, "command.delete.success", "{id}", id);
     }
 
     private Location parseLocation(String locStr) {

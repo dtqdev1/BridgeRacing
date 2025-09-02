@@ -80,9 +80,9 @@ public class SetupCommand implements Listener {
         if (setupSessions.containsKey(player.getUniqueId())) {
             setupSessions.remove(player.getUniqueId());
             player.getInventory().remove(wand);
-            player.sendMessage(ChatColor.YELLOW + "Đã hủy phiên thiết lập map.");
+            plugin.getMessageUtil().sendMessage(player, "command.setup.cancel");
         } else {
-            player.sendMessage(ChatColor.RED + "Bạn không đang trong phiên thiết lập nào.");
+            plugin.getMessageUtil().sendMessage(player, "command.setup.not-in-setup");
         }
     }
 
@@ -96,7 +96,7 @@ public class SetupCommand implements Listener {
         SetupSession session = setupSessions.get(player.getUniqueId());
         Action action = event.getAction();
         if (event.getClickedBlock() == null && (session.currentStep != SetupStep.SPAWN_1 && session.currentStep != SetupStep.CHECKPOINTS_1)) {
-            player.sendMessage(ChatColor.RED + "Bạn phải click vào một block!");
+            plugin.getMessageUtil().sendMessage(player, "setup.must-click-block");
             return;
         }
         Location clickedLoc = event.getClickedBlock() != null ? event.getClickedBlock().getLocation() : player.getLocation();
@@ -104,7 +104,7 @@ public class SetupCommand implements Listener {
             case SPAWN_1:
                 if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
                     session.p1_spawn = player.getLocation().clone(); // Lấy trực tiếp vị trí và hướng nhìn của người chơi
-                    player.sendMessage(ChatColor.GREEN + "Đã đặt điểm spawn cho Làn 1 tại vị trí bạn đang đứng.");
+                    plugin.getMessageUtil().sendMessage(player, "setup.set-spawn");
                     advanceStep(session);
                 }
                 break;
@@ -123,7 +123,7 @@ public class SetupCommand implements Listener {
             case CHECKPOINTS_1:
                 if (action == Action.RIGHT_CLICK_BLOCK) {
                     session.p1_checkpoints.add(clickedLoc);
-                    player.sendMessage(ChatColor.GREEN + "Đã thêm checkpoint " + session.p1_checkpoints.size() + ". Chuột phải để thêm, chuột trái khi đã thêm xong.");
+                    plugin.getMessageUtil().sendMessage(player, "setup.checkpoint-added", "{count}", session.p1_checkpoints.size());
                 } else if (action == Action.LEFT_CLICK_AIR || action == Action.LEFT_CLICK_BLOCK) {
                     advanceStep(session);
                 }
@@ -150,19 +150,19 @@ public class SetupCommand implements Listener {
         ChatColor a = ChatColor.AQUA;
         switch (session.currentStep) {
             case SPAWN_1:
-            player.sendMessage(p + "Bước 1/5: " + a + "Đứng tại vị trí spawn, nhìn đúng hướng và CHUỘT PHẢI để đặt ĐIỂM SPAWN cho Làn 1.");
+            plugin.getMessageUtil().sendMessage(player, "setup.step1");
                 break;
             case CORNER_1:
-                player.sendMessage(p + "Bước 2/5: " + a + "Chuột trái vào block để đặt GÓC THỨ NHẤT của bounding box.");
+            plugin.getMessageUtil().sendMessage(player, "setup.step2");
                 break;
             case CORNER_2:
-                player.sendMessage(p + "Bước 3/5: " + a + "Chuột phải vào block để đặt GÓC THỨ HAI của bounding box.");
+            plugin.getMessageUtil().sendMessage(player, "setup.step3");
                 break;
             case CHECKPOINTS_1:
-                player.sendMessage(p + "Bước 4/5: " + a + "Chuột phải để thêm CHECKPOINT, chuột trái khi đã thêm xong.");
+            plugin.getMessageUtil().sendMessage(player, "setup.step4");
                 break;
             case END_PLATE_1:
-                player.sendMessage(p + "Bước 5/5: " + a + "Chuột phải vào block để đặt GOLD PLATE kết thúc.");
+            plugin.getMessageUtil().sendMessage(player, "setup.step5");
                 break;
         }
     }

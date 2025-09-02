@@ -44,6 +44,15 @@ public class GameListener implements Listener {
         }
         Player player = event.getPlayer();
         DuelGame game = gameManager.getDuelByPlayer(player.getUniqueId());
+        if (game.getGameState() == DuelGame.GameState.COUNTDOWN) {
+            // Chỉ hủy nếu người chơi di chuyển vị trí, cho phép xoay camera
+            if (event.getFrom().getBlockX() != event.getTo().getBlockX() ||
+                event.getFrom().getBlockY() != event.getTo().getBlockY() ||
+                event.getFrom().getBlockZ() != event.getTo().getBlockZ()) {
+                event.setCancelled(true);
+            }
+            return;
+        }
         if (game == null || game.getGameState() != DuelGame.GameState.RUNNING) {
             return;
         }
@@ -106,7 +115,6 @@ public class GameListener implements Listener {
         }
         if (!game.getArena().isInBounds(event.getBlock().getLocation(), game.getDuelPlayer1().getPlayerUUID(), player.getUniqueId())) {
              event.setCancelled(true);
-             player.sendMessage(ChatColor.RED + "Bạn chỉ có thể xây trong làn đường của mình!");
              return;
         }
         game.addPlacedBlock(player, event.getBlock());

@@ -24,15 +24,15 @@ public class LeaveCommand implements CommandExecutor {
         Player player = (Player) sender;
         if (plugin.getDuelGameManager().getDuelByPlayer(player.getUniqueId()) != null) {
             plugin.getDuelGameManager().handlePlayerQuit(player, plugin.getDuelGameManager().getDuelByPlayer(player.getUniqueId()));
-            player.sendMessage(ChatColor.YELLOW + "Bạn đã rời khỏi trận đấu.");
+            plugin.getMessageUtil().sendMessage(player, "command.leave.success-game");
             return true;
         }
         if (plugin.getQueueManager().isPlayerInQueue(player)) {
             plugin.getQueueManager().removePlayerFromAllQueues(player);
-            player.sendMessage(ChatColor.YELLOW + "Bạn đã rời khỏi hàng chờ.");
+            plugin.getMessageUtil().sendMessage(player, "command.leave.success-queue");
             return true;
         }
-        player.sendMessage(ChatColor.RED + "Bạn không đang trong hàng chờ hoặc trận đấu nào.");
+        plugin.getMessageUtil().sendMessage(player, "command.leave.not-in-any");
         return true;
     }
 }

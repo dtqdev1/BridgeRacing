@@ -45,19 +45,19 @@ public class DuelCommand implements CommandExecutor {
                     return true;
                 }
                 if (args.length != 2) {
-                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&cSử dụng: /duel delete <id>"));
+                    plugin.getMessageUtil().sendMessage(player, "command.delete.usage");
                     return true;
                 }
                 plugin.getDuelArenaManager().deleteArena(args[1], player);
                 break;
             case "spectate":
                 if (args.length < 2) {
-                    player.sendMessage(ChatColor.RED + "Sử dụng: /duel spectate <tên_người_chơi>");
+                    plugin.getMessageUtil().sendMessage(player, "command.spectate.usage");
                     return true;
                 }
                 Player target = Bukkit.getPlayer(args[1]);
                 if (target == null) {
-                    player.sendMessage(ChatColor.RED + "Không tìm thấy người chơi này.");
+                    plugin.getMessageUtil().sendMessage(player, "player-not-found");
                     return true;
                 }
                 if (target.equals(player)) {

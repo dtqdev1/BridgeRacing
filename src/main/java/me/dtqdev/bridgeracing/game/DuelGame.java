@@ -138,7 +138,9 @@ public class DuelGame {
     public DuelArena getArena() { return arena; }
     public double getElapsedTimeSeconds() {
         if (startTime == 0) return 0.0;
-        return (System.currentTimeMillis() - startTime) / 1000.0;
+        double rawTime = (System.currentTimeMillis() - startTime) / 1000.0;
+        // ÁP DỤNG CÔNG THỨC LÀM TRÒN
+        return Math.ceil(rawTime / 0.05) * 0.05;
     }
      public double getProgress(UUID uuid) {
         DuelPlayer dp = getDuelPlayer(uuid);

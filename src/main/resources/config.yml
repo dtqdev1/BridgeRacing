@@ -19,6 +19,12 @@ elo:
     - { diff: 200, win: 0.8, loss: 1.2 }
     - { diff: 500, win: 0.5, loss: 1.5 } # Thắng người yếu hơn rất nhiều -> được 50% ELO, thua mất 150%
 
+# Tích hợp hologram với FastBuilder
+hologram:
+  top-rank-enabled: true
+  top-rank-limit: 50 # Giới hạn top để hiển thị
+  top-rank-format: "&b&l#&f{rank} &bBridgeRacing"
+
 # Cài đặt GUI chọn map
 gui:
   title: "&1&lChọn Map Thi Đấu"

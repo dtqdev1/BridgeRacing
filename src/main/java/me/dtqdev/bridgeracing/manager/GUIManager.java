@@ -115,4 +115,20 @@ public class GUIManager {
                     .replace("{wait_time}", waitTime));
         }
     }
+    public void startGuiUpdateTask() {
+        new org.bukkit.scheduler.BukkitRunnable() {
+            @Override
+            public void run() {
+                String guiTitle = ChatColor.translateAlternateColorCodes('&', plugin.getConfig().getString("gui.title", "&1Chọn Map"));
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    if (player.getOpenInventory() != null && player.getOpenInventory().getTitle().equals(guiTitle)) {
+                        if (plugin.getQueueManager().isPlayerInQueue(player)) {
+                            // Chỉ cập nhật item "in-queue"
+                            addInQueueItem(player.getOpenInventory().getTopInventory(), player);
+                        }
+                    }
+                }
+            }
+        }.runTaskTimer(plugin, 20L, 20L); // Chạy mỗi giây
+    }
 }

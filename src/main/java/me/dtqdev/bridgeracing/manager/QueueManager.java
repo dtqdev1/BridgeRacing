@@ -22,18 +22,18 @@ public class QueueManager {
 
     public void addPlayerToQueue(Player player, String mapId) {
         if (plugin.getDuelGameManager().getDuelByPlayer(player.getUniqueId()) != null) {
-            player.sendMessage(ChatColor.RED + "Bạn đang trong trận đấu, không thể tham gia hàng chờ!");
+            plugin.getMessageUtil().sendMessage(player, "error.in-game");
             return;
         }
         removePlayerFromAllQueues(player);
         DuelArena arena = plugin.getDuelArenaManager().getDuelArenaById(mapId);
         if (arena == null) {
-            player.sendMessage(ChatColor.RED + "Map không hợp lệ!");
+            plugin.getMessageUtil().sendMessage(player, "error.map-not-found");
             return;
         }
         List<PlayerInQueue> queue = queues.computeIfAbsent(mapId, k -> Collections.synchronizedList(new ArrayList<>()));
         queue.add(new PlayerInQueue(player.getUniqueId()));
-        player.sendMessage(ChatColor.GREEN + "Bạn đã tham gia hàng chờ cho map " + arena.getDisplayName() + ".");
+        plugin.getMessageUtil().sendMessage(player, "queue.join");
         plugin.getGuiManager().openMapSelector(player);
     }
 
@@ -41,7 +41,7 @@ public class QueueManager {
         for (List<PlayerInQueue> queue : queues.values()) {
             queue.removeIf(p -> p.getUuid().equals(player.getUniqueId()));
         }
-        player.sendMessage(ChatColor.YELLOW + "Bạn đã rời khỏi hàng chờ.");
+        plugin.getMessageUtil().sendMessage(player, "queue.leave");
         plugin.getGuiManager().openMapSelector(player);
     }
 

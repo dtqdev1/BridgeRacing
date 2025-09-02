@@ -70,6 +70,16 @@ public class DuelGameManager {
                     game.playSoundToBoth(Sound.NOTE_STICKS, 1, 1);
                     count--;
                 } else {
+                    
+                    Player p1 = Bukkit.getPlayer(game.getDuelPlayer1().getPlayerUUID());
+                    Player p2 = Bukkit.getPlayer(game.getDuelPlayer(p1.getUniqueId()).getOpponentUUID());
+
+                    if (p1 != null) {
+                        p1.teleport(game.getArena().getP1_spawn());
+                    }
+                    if (p2 != null) {
+                        p2.teleport(game.getArena().getP2_spawn());
+                    }
                     game.sendTitleToBoth("&a&lGO!", "", 0, 20, 10);
                     game.playSoundToBoth(Sound.NOTE_PLING, 1, 1.5f);
                     startGame(game);
