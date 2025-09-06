@@ -192,6 +192,7 @@ public class SetupCommand implements Listener {
         ConfigManager cfgManager = plugin.getConfigManager();
         FileConfiguration duelsConfig = cfgManager.getDuelsConfig();
         String basePath = "duel-arenas." + session.id;
+        duelsConfig.set(basePath + ".schematic-name", session.schematicName);
         duelsConfig.set(basePath + ".display-name", "&aArena #" + session.id);
         duelsConfig.set(basePath + ".gui-item", "IRON_SWORD");
         duelsConfig.set(basePath + ".player1.spawn", locationToString(session.p1_spawn));

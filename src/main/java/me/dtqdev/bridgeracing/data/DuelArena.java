@@ -9,6 +9,7 @@ public class DuelArena {
     private final String id;
     private final String displayName;
     private final String guiItemMaterial;
+    private final String schematicName;
     private final Location p1_spawn;
     private final Location p1_corner1;
     private final Location p1_corner2;
@@ -19,12 +20,13 @@ public class DuelArena {
     private final Location p2_corner2;
     private final Location p2_endPlate;
     private final List<Location> p2_checkpoints;
-    public DuelArena(String id, String displayName, String guiItemMaterial,
+    public DuelArena(String id, String displayName, String guiItemMaterial, String schematicName, 
                      Location p1_spawn, Location p1_corner1, Location p1_corner2, Location p1_endPlate, List<Location> p1_checkpoints,
                      Location p2_spawn, Location p2_corner1, Location p2_corner2, Location p2_endPlate, List<Location> p2_checkpoints) {
         this.id = id;
         this.displayName = displayName;
         this.guiItemMaterial = guiItemMaterial;
+        this.schematicName = schematicName;
         this.p1_spawn = p1_spawn;
         this.p1_corner1 = p1_corner1;
         this.p1_corner2 = p1_corner2;
@@ -66,6 +68,7 @@ public class DuelArena {
                loc.getY() >= minY && loc.getY() <= maxY &&
                loc.getZ() >= minZ && loc.getZ() <= maxZ;
     }
+    public String getSchematicName() { return schematicName; }
     public Location getP1_corner1() { return p1_corner1; }
     public Location getP1_corner2() { return p1_corner2; }
     public Location getP2_corner1() { return p2_corner1; }

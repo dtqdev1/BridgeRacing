@@ -63,7 +63,7 @@ public class BridgeRacingExpansion extends PlaceholderExpansion {
         if (identifier.equals("pb")) {
             DuelGame currentGame = plugin.getDuelGameManager().getDuelByPlayer(player.getUniqueId());
             if (currentGame != null) {
-                String mapId = currentGame.getArena().getId();
+                String mapId = currentGame.getArenaTemplate().getId();
                 double pb = plugin.getDuelRecordManager().getBestTime(player.getUniqueId(), mapId);
                 return pb > 0 ? df.format(pb) : "N/A";
             }

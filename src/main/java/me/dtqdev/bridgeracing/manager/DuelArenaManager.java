@@ -30,6 +30,7 @@ public class DuelArenaManager {
             String basePath = "duel-arenas." + id;
             String displayName = config.getString(basePath + ".display-name");
             String guiItem = config.getString(basePath + ".gui-item");
+            String schematicName = config.getString(basePath + ".schematic-name", id);
             Location p1_spawn = parseLocation(config.getString(basePath + ".player1.spawn"));
             Location p1_corner1 = parseLocation(config.getString(basePath + ".player1.corner1"));
             Location p1_corner2 = parseLocation(config.getString(basePath + ".player1.corner2"));
@@ -45,7 +46,7 @@ public class DuelArenaManager {
                 plugin.getLogger().warning("Invalid configuration for arena " + id + ". Skipping.");
                 continue;
             }
-            DuelArena arena = new DuelArena(id, displayName, guiItem, p1_spawn, p1_corner1, p1_corner2, p1_endPlate, p1_checkpoints,
+            DuelArena arena = new DuelArena(id, displayName, guiItem, schematicName, p1_spawn, p1_corner1, p1_corner2, p1_endPlate, p1_checkpoints,
                                             p2_spawn, p2_corner1, p2_corner2, p2_endPlate, p2_checkpoints);
             duelArenas.put(id, arena);
         }
