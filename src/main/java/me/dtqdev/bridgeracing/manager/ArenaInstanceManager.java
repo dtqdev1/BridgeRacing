@@ -1,10 +1,17 @@
 package me.dtqdev.bridgeracing.manager;
 
+import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.bukkit.BukkitWorld;
+import com.sk89q.worldedit.bukkit.WorldEditPlugin;
+import com.sk89q.worldedit.schematic.MCEditSchematicFormat;
+import com.sk89q.worldedit.CuboidClipboard;
 import me.dtqdev.bridgeracing.BridgeRacing;
 import me.dtqdev.bridgeracing.data.DuelArena;
 import org.bukkit.Location;
 import org.bukkit.World;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,13 +19,11 @@ import java.util.Map;
 
 public class ArenaInstanceManager {
     private final BridgeRacing plugin;
-    private final SchematicManager schematicManager;
     private final Map<String, List<DuelArena>> arenaInstances; // MapId -> List of instances
     private final Map<String, Integer> nextInstanceOffset; // MapId -> Next offset for new instance
 
     public ArenaInstanceManager(BridgeRacing plugin) {
         this.plugin = plugin;
-        this.schematicManager = plugin.getSchematicManager();
         this.arenaInstances = new HashMap<>();
         this.nextInstanceOffset = new HashMap<>();
     }
@@ -42,7 +47,7 @@ public class ArenaInstanceManager {
     }
 
     private DuelArena createNewInstance(String mapId) {
-        DuelArena originalArena = plugin.getDuelArenaManager().getArena(mapId);
+        DuelArena originalArena = plugin.getDuelArenaManager().getDuelArenaById(mapId);
         if (originalArena == null) return null;
 
         Integer currentOffset = nextInstanceOffset.getOrDefault(mapId, 1);
@@ -53,12 +58,42 @@ public class ArenaInstanceManager {
         DuelArena newInstance = cloneArenaWithOffset(originalArena, offset);
         
         // Paste schematic tại vị trí mới
-        Location pasteLocation = newInstance.getP1_spawn().clone();
-        pasteLocation.setY(pasteLocation.getY() - 1); // Điều chỉnh vị trí paste nếu cần
-        schematicManager.pasteSchematic(mapId, pasteLocation);
+        try {
+            Location pasteLocation = newInstance.getP1_spawn().clone();
+            pasteLocation.setY(pasteLocation.getY() - 1); // Điều chỉnh vị trí paste nếu cần
+            
+            // Lấy đường dẫn đến file schematic
+            File schematicFile = new File(plugin.getDataFolder(), "schematics/" + mapId + ".schematic");
+            if (!schematicFile.exists()) {
+                plugin.getLogger().warning("Schematic not found for map: " + mapId);
+                return null;
+            }
 
-        // Thêm instance mới vào danh sách
-        arenaInstances.computeIfAbsent(mapId, k -> new ArrayList<>()).add(newInstance);
+            // Lấy WorldEdit plugin
+            WorldEditPlugin worldEdit = (WorldEditPlugin) plugin.getServer().getPluginManager().getPlugin("WorldEdit");
+            if (worldEdit == null) {
+                plugin.getLogger().warning("WorldEdit not found!");
+                return null;
+            }
+
+            // Load và paste schematic
+            EditSession editSession = worldEdit.getWorldEdit().getEditSessionFactory()
+                .getEditSession(new BukkitWorld(pasteLocation.getWorld()), -1);
+            
+            CuboidClipboard clipboard = MCEditSchematicFormat.getFormat(schematicFile)
+                .load(schematicFile);
+
+            clipboard.paste(editSession, 
+                new Vector(pasteLocation.getX(), pasteLocation.getY(), pasteLocation.getZ()), 
+                false);
+            
+            // Thêm instance mới vào danh sách
+            arenaInstances.computeIfAbsent(mapId, k -> new ArrayList<>()).add(newInstance);
+            
+        } catch (Exception e) {
+            plugin.getLogger().severe("Error pasting schematic: " + e.getMessage());
+            return null;
+        }
         
         return newInstance;
     }
