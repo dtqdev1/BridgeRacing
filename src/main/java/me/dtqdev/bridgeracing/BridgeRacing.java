@@ -21,7 +21,6 @@ public class BridgeRacing extends JavaPlugin {
     private ConfigManager configManager;
     private DuelArenaManager duelArenaManager;
     private EloManager eloManager;
-    // private HistoryManager historyManager; // Đã xóa
     private QueueManager queueManager;
     private DuelGameManager duelGameManager;
     private GUIManager guiManager;
@@ -30,6 +29,7 @@ public class BridgeRacing extends JavaPlugin {
     private SetupCommand setupCommand;
     private SpectateManager spectateManager;
     private MessageUtil messageUtil;
+    private ArenaInstanceManager arenaInstanceManager;
 
     @Override
     public void onEnable() {
@@ -57,6 +57,7 @@ public class BridgeRacing extends JavaPlugin {
         this.setupCommand = new SetupCommand(this);
         this.messageUtil = new MessageUtil(this);
         this.spectateManager = new SpectateManager(this);
+        this.arenaInstanceManager = new ArenaInstanceManager(this);
 
         duelArenaManager.loadArenas();
 
@@ -98,6 +99,7 @@ public class BridgeRacing extends JavaPlugin {
     public SetupCommand getSetupCommand() { return setupCommand; }
     public SpectateManager getSpectateManager() { return spectateManager; }
     public MessageUtil getMessageUtil() { return messageUtil; }
+    public ArenaInstanceManager getArenaInstanceManager() { return arenaInstanceManager; }
 
     // Thêm getter này
     public FileConfiguration getMessagesConfig() {

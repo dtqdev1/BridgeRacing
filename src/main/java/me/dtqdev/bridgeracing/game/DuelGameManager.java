@@ -25,16 +25,24 @@ public class DuelGameManager {
     public DuelGameManager(BridgeRacing plugin) {
         this.plugin = plugin;
     }
-    public void createGame(Player p1, Player p2, DuelArena duelArena) {
+    public void createGame(Player p1, Player p2, DuelArena originalArena) {
+        // Lấy một arena instance có sẵn hoặc tạo mới
+        DuelArena availableArena = plugin.getArenaInstanceManager().getAvailableArena(originalArena.getId());
+        if (availableArena == null) {
+            p1.sendMessage("§cKhông thể tạo trận đấu. Vui lòng thử lại sau!");
+            p2.sendMessage("§cKhông thể tạo trận đấu. Vui lòng thử lại sau!");
+            return;
+        }
+
         DuelPlayer duelP1 = savePlayerState(p1);
         DuelPlayer duelP2 = savePlayerState(p2);
         duelP1.setOpponentUUID(p2.getUniqueId());
         duelP2.setOpponentUUID(p1.getUniqueId());
-        DuelGame game = new DuelGame(duelArena, duelP1, duelP2);
+        DuelGame game = new DuelGame(availableArena, duelP1, duelP2);
         activeDuels.put(p1.getUniqueId(), game);
         activeDuels.put(p2.getUniqueId(), game);
-        preparePlayer(p1, duelArena.getP1_spawn());
-        preparePlayer(p2, duelArena.getP2_spawn());
+        preparePlayer(p1, availableArena.getP1_spawn());
+        preparePlayer(p2, availableArena.getP2_spawn());
         startCountdown(game);
     }
     private DuelPlayer savePlayerState(Player player) {
