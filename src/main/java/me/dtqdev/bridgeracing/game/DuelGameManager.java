@@ -111,9 +111,9 @@ public class DuelGameManager {
         
         // Chỉ tính PB nếu người thua không thoát game
         if (loser != null && loser.isOnline()) {
-            double oldBest = plugin.getDuelRecordManager().getBestTime(winner.getUniqueId(), mapId);
-            plugin.getDuelRecordManager().setBestTime(winner.getUniqueId(), mapId, timeTaken);
-            if (oldBest == -1 || timeTaken < oldBest) {
+            boolean isNewRecord = plugin.getDuelRecordManager().setBestTime(winner.getUniqueId(), mapId, timeTaken);
+            if (isNewRecord) {
+                // Tin nhắn này bây giờ chỉ gửi khi setBestTime trả về true
                 winner.sendMessage(ChatColor.GOLD + "Bạn đã lập kỷ lục mới trên map " + mapId + ": " + df.format(timeTaken) + "s");
             }
         }

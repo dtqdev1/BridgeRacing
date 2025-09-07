@@ -47,7 +47,7 @@ public class DuelRecordManager {
         return -1; // -1 nghĩa là chưa có kỷ lục
     }
 
-    public void setBestTime(UUID uuid, String mapId, double time) {
+    public boolean setBestTime(UUID uuid, String mapId, double time) {
         Map<String, DuelRecord> playerRecords = recordCache.computeIfAbsent(uuid, k -> new ConcurrentHashMap<>());
         
         double currentBest = getBestTime(uuid, mapId);
@@ -58,6 +58,8 @@ public class DuelRecordManager {
             String path = "players." + uuid.toString() + ".records." + mapId;
             plugin.getConfigManager().getPlayerDataConfig().set(path + ".time", time);
             plugin.getConfigManager().getPlayerDataConfig().set(path + ".timestamp", System.currentTimeMillis());
+            return true;
         }
+        return false;
     }
 }
