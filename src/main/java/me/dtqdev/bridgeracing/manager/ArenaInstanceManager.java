@@ -28,9 +28,12 @@ public class ArenaInstanceManager {
         
         // Kiểm tra xem có instance nào đang trống không
         for (DuelArena instance : instances) {
-            int playingCount = plugin.getDuelGameManager().getPlayingCount(instance.getId());
-            if (playingCount < 2) { // Nếu có ít hơn 2 người đang chơi
-                return instance;
+            String instanceId = instance.getId();
+            if (instanceId != null) {
+                int playingCount = plugin.getDuelGameManager().getPlayingCount(instanceId);
+                if (playingCount < 2) { // Nếu có ít hơn 2 người đang chơi
+                    return instance;
+                }
             }
         }
 
@@ -42,8 +45,9 @@ public class ArenaInstanceManager {
         DuelArena originalArena = plugin.getDuelArenaManager().getArena(mapId);
         if (originalArena == null) return null;
 
-        int offset = nextInstanceOffset.getOrDefault(mapId, 1) * 100; // Mỗi instance cách nhau 100 block
-        nextInstanceOffset.put(mapId, nextInstanceOffset.getOrDefault(mapId, 1) + 1);
+        Integer currentOffset = nextInstanceOffset.getOrDefault(mapId, 1);
+        int offset = currentOffset * 100; // Mỗi instance cách nhau 100 block
+        nextInstanceOffset.put(mapId, currentOffset + 1);
 
         // Clone arena với offset
         DuelArena newInstance = cloneArenaWithOffset(originalArena, offset);
